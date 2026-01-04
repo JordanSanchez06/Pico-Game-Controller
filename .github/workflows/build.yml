@@ -1,0 +1,45 @@
+name: Build Pico Firmware
+
+on: [push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Install Toolchain
+      run: |
+        sudo apt update
+        sudo apt install -y cmake gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential libstdc++-arm-none-eabi-newlib
+
+    - name: Clone Pico SDK
+      run: |
+        git clone https://github.com/raspberrypi/pico-sdk.git
+        echo "PICO_SDK_PATH=$PWD/pico-sdk" >> $GITHUB_ENV
+
+    - name: Prepare SDK Submodules
+      run: |
+        cd pico-sdk
+        git submodule update --init
+
+    - name: Create Build Directory
+      run: mkdir build
+
+    - name: Configure CMake
+      run: |
+        cd build
+        cmake ..
+
+    - name: Compile
+      run: |
+        cd build
+        make
+
+    - name: Upload Firmware (.uf2)
+      uses: actions/upload-artifact@v4
+      with:
+        name: pico_firmware
+        path: build/*.uf2
