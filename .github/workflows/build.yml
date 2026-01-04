@@ -20,7 +20,7 @@ jobs:
         git clone https://github.com/raspberrypi/pico-sdk.git
         echo "PICO_SDK_PATH=$PWD/pico-sdk" >> $GITHUB_ENV
 
-    - name: Prepare SDK Submodules
+    - name: Prepare SDK
       run: |
         cd pico-sdk
         git submodule update --init
@@ -38,8 +38,8 @@ jobs:
         cd build
         make
 
-    - name: Upload Firmware (.uf2)
+    - name: Upload Firmware
       uses: actions/upload-artifact@v4
       with:
         name: pico_firmware
-        path: build/*.uf2
+        path: build/**/*.uf2
